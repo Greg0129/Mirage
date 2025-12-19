@@ -114,21 +114,29 @@ void destroy_virtual_mouse(int virtualMouse) {
 
 
 
-int main() {
-	int virtualKeyboard1 = create_virtual_keyboard("VirtualKeyboard1");
-	int virtualKeyboard2 = create_virtual_keyboard("VirtualKeyboard2");
+int main(int argc, char** argv) {
+    // Add Virtual Devices
+    int virtualKeyboard1 = create_virtual_keyboard("VirtualKeyboard1");
+    int virtualKeyboard2 = create_virtual_keyboard("VirtualKeyboard2");
 
-	int physicalKeyboard = create_physical_keyboard("/dev/input/event2");
+    // Add Physical Devices
+    int physicalKeyboard = create_physical_keyboard("/dev/input/event2");
 
-	struct input_event ev;
-	while (1) {
-		ssize_t n = read(physicalKeyboard, &ev, sizeof(ev));
-		if (n != sizeof(ev)) continue;
+    struct input_event ev;
+    while (1) {
+        // Read Physical Device Events
+        ssize_t n = read(physicalKeyboard, &ev, sizeof(ev));
+        if (n != sizeof(ev)) continue;
 
-		write(virtualKeyboard1, &ev, sizeof(ev));
-		write(virtualKeyboard2, &ev, sizeof(ev));
-	}
+        // Write Device Events to Virtual Devices
+        write(virtualKeyboard1, &ev, sizeof(ev));
+        write(virtualKeyboard2, &ev, sizeof(ev));
+    }
 
-	destroy_physical_keyboard(physicalKeyboard);
-	destroy_virtual_keyboard(virtualKeyboard1);
+    // Remove Physical Devices
+    destroy_physical_keyboard(physicalKeyboard);
+
+    // Remove Virtual Devices
+    destroy_virtual_keyboard(virtualKeyboard1);
+    destroy_virtual_keyboard(virtualKeyboard2);
 }
